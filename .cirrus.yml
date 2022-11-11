@@ -1,0 +1,5 @@
+macos_instance:
+  image: ghcr.io/cirruslabs/macos-ventura-base:latest
+
+task:
+  script: echo "Hello World from macOS!"
