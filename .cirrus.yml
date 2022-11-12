@@ -5,4 +5,11 @@ macos_instance:
   image: ghcr.io/cirruslabs/macos-ventura-xcode:latest
 
 task:
+  name: brew update
   script: brew update; brew upgrade
+
+task:
+  check_clang_script:
+    - clang --version
+  ci_script:
+    - /usr/bin/env bash ./release-macos.sh
