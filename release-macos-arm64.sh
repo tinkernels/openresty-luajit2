@@ -45,7 +45,9 @@ MACOSX_DEPLOYMENT_TARGET=10.10 make install PREFIX="$TK_CUSTOM_LUA_PREFIX_DIR"
 # pack release files
 cd "$SH_SELF_PATH_DIR_RESULT" || exit
 
-tar -cvf luajit-dist-macos-arm64.tar.gz luajit-dist
+TK_LUAJIT_RELEASE_TARBALL="luajit-dist-macos-arm64.tar.gz"
+
+tar -cvf "$TK_LUAJIT_RELEASE_TARBALL" luajit-dist
 
 if [[ "$CIRRUS_RELEASE" == "" ]]; then
   echo "Not a release. No need to deploy!"
@@ -57,19 +59,19 @@ if [[ "$GITHUB_TOKEN" == "" ]]; then
   exit 1
 fi
 
-file_content_type="application/octet-stream"
-files_to_upload=(
-  luajit-dist.tar.gz
+FILE_CONTENT_TYPE="application/octet-stream"
+FILES_TO_UPLOAD=(
+  "$TK_LUAJIT_RELEASE_TARBALL"
 )
 
-for fpath in "${files_to_upload[@]}"
+for FPATH in "${FILES_TO_UPLOAD[@]}"
 do
-  echo "Uploading $fpath..."
-  name=$(basename "$fpath")
-  url_to_upload="https://uploads.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases/$CIRRUS_RELEASE/assets?name=$name"
+  echo "Uploading $FPATH..."
+  NAME=$(basename "$FPATH")
+  URL_TO_UPLOAD="https://uploads.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases/$CIRRUS_RELEASE/assets?name=$NAME"
   curl -X POST \
-    --data-binary @"$fpath" \
+    --data-binary @"$FPATH" \
     --header "Authorization: token $GITHUB_TOKEN" \
-    --header "Content-Type: $file_content_type" \
-    "$url_to_upload"
+    --header "Content-Type: $FILE_CONTENT_TYPE" \
+    "$URL_TO_UPLOAD"
 done
