@@ -1,7 +1,8 @@
 env:
   GITHUB_TOKEN: ENCRYPTED[18b4ba0db4d2030f2229d02b066c5d077a1d642be75c865e63d10cadfc50440d5ddef3bf3d0cab69c4d5f9a4ea77cea4]
+
 macos_instance:
   image: ghcr.io/cirruslabs/macos-ventura-xcode:latest
 
 task:
-  script: brew update
+  script: brew update; brew upgrade
