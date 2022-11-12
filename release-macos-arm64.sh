@@ -42,8 +42,12 @@ MACOSX_DEPLOYMENT_TARGET=10.10 make PREFIX=luajit-dist
 
 MACOSX_DEPLOYMENT_TARGET=10.10 make install PREFIX="$TK_CUSTOM_LUA_PREFIX_DIR"
 
-# pack release files
 cd "$SH_SELF_PATH_DIR_RESULT" || exit
+
+echo "checking luajit."
+luajit-dist/bin/luajit -v
+
+echo "will pack release files."
 
 TK_LUAJIT_RELEASE_TARBALL="luajit-dist-macos-arm64.tar.gz"
 

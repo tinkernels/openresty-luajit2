@@ -8,5 +8,5 @@ task:
   name: build and release
   check_clang_script:
     - clang --version
-  ci_script:
+  build_release_script:
     - /usr/bin/env bash ./release-macos-arm64.sh
