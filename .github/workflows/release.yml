@@ -12,7 +12,7 @@ on:
         default: "Mona the Octocat"
 
 jobs:
-  release:
+  release-macos:
     runs-on: macos-latest
     steps:
       - name: Check out code
@@ -25,5 +25,21 @@ jobs:
         with:
           allowUpdates: true
           artifacts: "*.tar.gz"
+          generateReleaseNotes: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  release-windows:
+    runs-on: windows-2019
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Build and Pack for release
+        run: cmd /c "${{ github.workspace }}/release-windows.cmd
+
+      - uses: ncipollo/release-action@v1
+        with:
+          allowUpdates: true
+          artifacts: "*.7z"
           generateReleaseNotes: true
           token: ${{ secrets.GITHUB_TOKEN }}
