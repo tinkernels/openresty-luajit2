@@ -45,7 +45,7 @@ MACOSX_DEPLOYMENT_TARGET=10.10 make install PREFIX="$TK_CUSTOM_LUA_PREFIX_DIR"
 # pack release files
 cd "$SH_SELF_PATH_DIR_RESULT" || exit
 
-tar -cvf luajit-dist.tar.gz luajit-dist
+tar -cvf luajit-dist-macos-arm64.tar.gz luajit-dist
 
 if [[ "$CIRRUS_RELEASE" == "" ]]; then
   echo "Not a release. No need to deploy!"

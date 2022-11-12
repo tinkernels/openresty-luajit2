@@ -9,4 +9,4 @@ task:
   check_clang_script:
     - clang --version
   ci_script:
-    - /usr/bin/env bash ./release-macos.sh
+    - /usr/bin/env bash ./release-macos-arm64.sh
