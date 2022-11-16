@@ -5,6 +5,7 @@ macos_instance:
   image: ghcr.io/cirruslabs/macos-ventura-xcode:latest
 
 task:
+  only_if: $CIRRUS_RELEASE != ''
   name: build and release
   check_clang_script:
     - clang --version

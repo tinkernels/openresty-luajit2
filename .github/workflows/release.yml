@@ -12,7 +12,7 @@ on:
         default: "Mona the Octocat"
 
 jobs:
-  release-macos:
+  release-macos-amd64:
     runs-on: macos-latest
     steps:
       - name: Check out code
