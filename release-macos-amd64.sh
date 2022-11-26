@@ -47,6 +47,9 @@ cd "$SH_SELF_PATH_DIR_RESULT" || exit
 echo "checking luajit."
 luajit-dist/bin/luajit -v
 
+echo "changing dylib id."
+install_name_tool -id @rpath/libluajit-5.1.dylib luajit-dist/lib/libluajit-5.1.dylib
+
 echo "will pack release files."
 
 TK_LUAJIT_RELEASE_TARBALL="luajit-dist-macos-amd64.tar.gz"
