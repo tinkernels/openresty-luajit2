@@ -58,26 +58,62 @@ TK_LUAJIT_RELEASE_TARBALL="luajit-dist-macos-arm64.tar.gz"
 
 tar -cvf "$TK_LUAJIT_RELEASE_TARBALL" luajit-dist
 
+# Upload release artificats to github release assets
+FILES_TO_UPLOAD=(
+  "$TK_LUAJIT_RELEASE_TARBALL"
+)
+
 if [[ "$GITHUB_TOKEN" == "" ]]; then
   echo "Please provide GitHub access token via GITHUB_TOKEN environment variable!"
   exit 1
 fi
 
 FILE_CONTENT_TYPE="application/octet-stream"
-FILES_TO_UPLOAD=(
-  "$TK_LUAJIT_RELEASE_TARBALL"
+
+function get_release_id_of_git_tag {
+    JSON_GITHUB_RELEASES_=$(curl -sSfL \
+    -H "Accept: application/vnd.github+json" \
+    -H "Authorization: token $GITHUB_TOKEN" \
+    -H "X-GitHub-Api-Version: 2022-11-28" \
+    "https://api.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases")
+
+    [ -n "$JSON_GITHUB_RELEASES_" ] || exit
+
+    PY_CODE_=$(cat <<EOF
+import json
+import sys
+try:
+    j_ = json.load(sys.stdin)
+    for release_ in j_:
+        if release_["tag_name"] == "$1":
+            print(release_["id"])
+except (Exception,):
+    pass
+EOF
 )
+    echo "$JSON_GITHUB_RELEASES_" | python3 -c "$PY_CODE_"
+}
+
+GIT_MOST_RECENT_TAG=$(git describe --tags --abbrev=0 "$(git rev-list --tags --max-count=1)")
+echo "GIT_MOST_RECENT_TAG: $GIT_MOST_RECENT_TAG"
+
+# Loop until github release for current 
+GITHUB_RELEASE_ID_=""
+while true
+do
+    GITHUB_RELEASE_ID_=$(get_release_id_of_git_tag "$GIT_MOST_RECENT_TAG")
+    [ -n "$GITHUB_RELEASE_ID_" ] && break
+    sleep 60
+done
 
 for FPATH in "${FILES_TO_UPLOAD[@]}"
 do
-  echo "Uploading $FPATH..."
-  NAME=$(basename "$FPATH")
-  GIT_MOST_RECENT_TAG=$(git describe --tags --abbrev=0 "$(git rev-list --tags --max-count=1)")
-  echo "GIT_MOST_RECENT_TAG: $GIT_MOST_RECENT_TAG"
-  URL_TO_UPLOAD="https://uploads.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases/$GIT_MOST_RECENT_TAG/assets?name=$NAME"
-  curl -X POST \
-    --data-binary @"$FPATH" \
-    --header "Authorization: token $GITHUB_TOKEN" \
-    --header "Content-Type: $FILE_CONTENT_TYPE" \
-    "$URL_TO_UPLOAD"
+    echo "Uploading $FPATH..."
+    NAME=$(basename "$FPATH")
+    URL_TO_UPLOAD="https://uploads.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases/$GITHUB_RELEASE_ID_/assets?name=$NAME"
+    curl -X POST \
+        --data-binary @"$FPATH" \
+        --header "Authorization: token $GITHUB_TOKEN" \
+        --header "Content-Type: $FILE_CONTENT_TYPE" \
+        "$URL_TO_UPLOAD"
 done
