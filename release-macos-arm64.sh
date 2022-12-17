@@ -24,6 +24,14 @@ unset ORIGINAL_PWD_GETSELFPATHVAR SH_FILE_RUN_PATH_GETSELFPATHVAR SH_FILE_RUN_BA
 
 cd "$SH_SELF_PATH_DIR_RESULT" || exit
 
+# Originally for cirrus ci, build only when recent tag exists.
+GIT_MOST_RECENT_TAG=$(git describe --tags --abbrev=0 "$(git rev-list --tags --max-count=1)")
+if [ -n "$GIT_MOST_RECENT_TAG" ];then
+    echo "GIT_MOST_RECENT_TAG: $GIT_MOST_RECENT_TAG"
+else
+    echo "No tag found, skip job."
+fi
+
 brew update; brew upgrade
 
 git clone --depth 1 --recurse-submodules --branch v2.1-agentzh https://github.com/openresty/luajit2.git luajit-src
@@ -93,9 +101,6 @@ EOF
 )
     echo "$JSON_GITHUB_RELEASES_" | python3 -c "$PY_CODE_"
 }
-
-GIT_MOST_RECENT_TAG=$(git describe --tags --abbrev=0 "$(git rev-list --tags --max-count=1)")
-echo "GIT_MOST_RECENT_TAG: $GIT_MOST_RECENT_TAG"
 
 # Loop until github release for current 
 GITHUB_RELEASE_ID_=""
