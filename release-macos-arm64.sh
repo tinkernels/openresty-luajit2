@@ -58,11 +58,6 @@ TK_LUAJIT_RELEASE_TARBALL="luajit-dist-macos-arm64.tar.gz"
 
 tar -cvf "$TK_LUAJIT_RELEASE_TARBALL" luajit-dist
 
-if [[ "$CIRRUS_RELEASE" == "" ]]; then
-  echo "Not a release. No need to deploy!"
-  exit 0
-fi
-
 if [[ "$GITHUB_TOKEN" == "" ]]; then
   echo "Please provide GitHub access token via GITHUB_TOKEN environment variable!"
   exit 1
@@ -77,7 +72,9 @@ for FPATH in "${FILES_TO_UPLOAD[@]}"
 do
   echo "Uploading $FPATH..."
   NAME=$(basename "$FPATH")
-  URL_TO_UPLOAD="https://uploads.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases/$CIRRUS_RELEASE/assets?name=$NAME"
+  GIT_MOST_RECENT_TAG=$(git describe --tags --abbrev=0 "$(git rev-list --tags --max-count=1)")
+  echo "GIT_MOST_RECENT_TAG: $GIT_MOST_RECENT_TAG"
+  URL_TO_UPLOAD="https://uploads.github.com/repos/$CIRRUS_REPO_FULL_NAME/releases/$GIT_MOST_RECENT_TAG/assets?name=$NAME"
   curl -X POST \
     --data-binary @"$FPATH" \
     --header "Authorization: token $GITHUB_TOKEN" \
