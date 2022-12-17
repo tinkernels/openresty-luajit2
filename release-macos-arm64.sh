@@ -29,7 +29,7 @@ GIT_MOST_RECENT_TAG=$(git describe --tags --abbrev=0 "$(git rev-list --tags --ma
 if [ -n "$GIT_MOST_RECENT_TAG" ];then
     echo "GIT_MOST_RECENT_TAG: $GIT_MOST_RECENT_TAG"
 else
-    echo "No tag found, skip job." && exit 1
+    echo "No tag found, skip job." && exit
 fi
 
 brew update; brew upgrade
