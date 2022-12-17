@@ -24,36 +24,4 @@ unset ORIGINAL_PWD_GETSELFPATHVAR SH_FILE_RUN_PATH_GETSELFPATHVAR SH_FILE_RUN_BA
 
 cd "$SH_SELF_PATH_DIR_RESULT" || exit
 
-brew update; brew upgrade
-
-git clone --depth 1 --recurse-submodules --branch v2.1-agentzh https://github.com/openresty/luajit2.git luajit-src
-
-mkdir ./luajit-dist
-
-cd luajit-dist || exit
-TK_CUSTOM_LUA_PREFIX_DIR=$(pwd -P)
-echo "TK_CUSTOM_LUA_PREFIX_DIR: $TK_CUSTOM_LUA_PREFIX_DIR"
-
-cd "$SH_SELF_PATH_DIR_RESULT/luajit-src" || exit
-
-MACOSX_DEPLOYMENT_TARGET=10.10 make clean
-
-MACOSX_DEPLOYMENT_TARGET=10.10 make PREFIX=luajit-dist
-
-MACOSX_DEPLOYMENT_TARGET=10.10 make install PREFIX="$TK_CUSTOM_LUA_PREFIX_DIR"
-
-cd "$SH_SELF_PATH_DIR_RESULT" || exit
-
-echo "checking luajit."
-luajit-dist/bin/luajit -v
-
-echo "changing dylib id."
-install_name_tool -id @rpath/libluajit-5.1.dylib luajit-dist/lib/libluajit-5.1.dylib
-
-cp -fv "$SH_SELF_PATH_DIR_RESULT/run-luarocks.sh" "$TK_CUSTOM_LUA_PREFIX_DIR"
-
-echo "will pack release files."
-
-TK_LUAJIT_RELEASE_TARBALL="luajit-dist-macos-amd64.tar.gz"
-
-tar -cvf "$TK_LUAJIT_RELEASE_TARBALL" luajit-dist
+luarocks --lua-dir "$SH_SELF_PATH_DIR_RESULT" --tree "$SH_SELF_PATH_DIR_RESULT" "$@"
