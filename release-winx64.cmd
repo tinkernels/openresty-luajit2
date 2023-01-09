@@ -5,30 +5,6 @@ set original_pwd=%CD%
 
 cd %~dp0
 
-echo=
-echo where is MSBuild.exe...
-where MSBuild.exe 2>&1
-IF %ERRORLEVEL% EQU 0 (
-    echo=
-    echo where is CL.exe...
-    where CL.exe 2>&1
-    IF %ERRORLEVEL% EQU 0 (
-        echo=
-        echo where is LINK.exe...
-        where LINK.exe 2>&1
-            IF %ERRORLEVEL% EQU 0 (
-                echo=
-                echo Found MSBuild CL LINK
-                goto ____skip_vsenv
-        )
-    )
-)
-echo=
-echo setting visual studio env...
-echo=
-call "%~dp0\vsenv.cmd" 64
-:____skip_vsenv
-
 set DIST_DIR=luajit-dist-winx64
 mkdir %DIST_DIR%\lib
 mkdir %DIST_DIR%\include
