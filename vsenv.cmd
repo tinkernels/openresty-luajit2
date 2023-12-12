@@ -24,16 +24,18 @@ echo setting visual studio env...
 echo=
 
 @REM    Determine path to VsDevCmd.bat
-for /f "usebackq delims=#" %%a in (`"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`) do set found_vcvar_bat_path_by_me=%%a\VC\Auxiliary\Build
+for /f "usebackq delims=#" %%a in (
+    `"%programfiles(x86)%\Microsoft Visual Studio\Installer\vswhere" -latest -property installationPath`
+) do set FOUND_VCVAR_BAT_PATH_BY_ME=%%a\VC\Auxiliary\Build
 
 if [%1] equ [64] (
-    call "%found_vcvar_bat_path_by_me%\vcvars64.bat"
+    call "%FOUND_VCVAR_BAT_PATH_BY_ME%\vcvars64.bat"
 ) else if [%1] equ [32] (
-    call "%found_vcvar_bat_path_by_me%\vcvars32.bat"
+    call "%FOUND_VCVAR_BAT_PATH_BY_ME%\vcvars32.bat"
 ) else (
-    call "%found_vcvar_bat_path_by_me%\vcvarsall.bat" %*
+    call "%FOUND_VCVAR_BAT_PATH_BY_ME%\vcvarsall.bat" %*
 )
 
-set found_vcvar_bat_path_by_me=
+set FOUND_VCVAR_BAT_PATH_BY_ME=
 
 :____skip_vsenv
